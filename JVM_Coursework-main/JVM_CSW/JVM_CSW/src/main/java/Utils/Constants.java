@@ -16,4 +16,5 @@ public class Constants {
     public static String PROJECTS_DATA = "./src/main/resources/data/projects_Data.json";
     public static String APP_TITLE = "JFX Task Manager";
     public static String TRIAL_FILE = "./src/main/resources/data/projects_Data2.json";
+    public static String FXML_Critical_PATH = "/View/CriticalPath.fxml";
 }

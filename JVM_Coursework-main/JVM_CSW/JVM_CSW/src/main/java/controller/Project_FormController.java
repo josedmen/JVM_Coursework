@@ -118,16 +118,11 @@ public class Project_FormController implements Initializable {
 
         try {
             //code to add to json
-            BufferedReader url = new BufferedReader(new FileReader(TRIAL_FILE));
-            List<ProjectFactory> list = new Gson().fromJson(url, new TypeToken<List<ProjectFactory>>() {
-            }.getType());
-
+            BufferedReader url = new BufferedReader(new FileReader(TRIAL_FILE)); //read Data
             ChildrenFactory child = new ChildrenFactory(ChildrenTxt.getText()); // Creating the new Child
-
 
             ChildrenPairFactory c = new ChildrenPairFactory(this.ChildrenTxt);
             List<String>children = c.childs();
-
 
             ProjectFactory factory = new ProjectFactory(ProjectName.getText()
                     , true, Email.getText(), PhoneNumberTxt.getText()
@@ -135,16 +130,15 @@ public class Project_FormController implements Initializable {
                     ProjectName.getText(), ChildrenTxt.getText(), children,
                     Float.parseFloat(DurationTxt.getText()));
 
+            List<ProjectFactory> list = new Gson().fromJson(url, new TypeToken<List<ProjectFactory>>() {
+            }.getType());
             list.add(factory);
 
             /*Persistance p = new Persistance();
             p.saveData(factory,list,url);*/
 
-           APersistance ap = new FilePersistence();
-           ap.saveProjects(TRIAL_FILE,list);
-
-
-
+           APersistance ap = new FilePersistence();//Save Data
+           ap.saveProjects(PROJECTS_DATA,list);
 
             clearFields();
             return "Success";
