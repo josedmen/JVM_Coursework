@@ -5,6 +5,7 @@ package controller;
 //import com.mysql.jdbc.Connection;
 //import com.mysql.jdbc.PreparedStatement;
 
+import Persistance.Persistance;
 import Utils.Constants;
 import com.google.gson.Gson;
         import com.google.gson.reflect.TypeToken;
@@ -111,17 +112,16 @@ public class Project_FormController implements Initializable {
     }
 
     private String saveData() {
-        List<ProjectFactory> list = null;
 
 
         try {
             //code to add to json
-
-
             BufferedReader url = new BufferedReader(new FileReader(TRIAL_FILE));
+            List<ProjectFactory> list = new Gson().fromJson(url, new TypeToken<List<ProjectFactory>>() {
+            }.getType());
 
             ChildrenFactory child = new ChildrenFactory(ChildrenTxt.getText()); // Creating the new Child
-            Gson gson = new Gson();
+
 
             ChildrenPairFactory c = new ChildrenPairFactory(this.ChildrenTxt);
             List<String>children = c.childs();
@@ -133,23 +133,9 @@ public class Project_FormController implements Initializable {
                     ProjectName.getText(), ChildrenTxt.getText(), children,
                     Float.parseFloat(DurationTxt.getText()));
 
+            Persistance p = new Persistance();
+            p.saveData(factory,list,url);
 
-            list = new Gson().fromJson(url, new TypeToken<List<ProjectFactory>>() {
-            }.getType());
-            list.add(factory);
-
-
-            String json = gson.toJson(list);
-
-
-            System.out.println(json);
-
-
-            FileWriter fileWriter = new FileWriter(TRIAL_FILE);     // writing back to the file
-            BufferedWriter bw = new BufferedWriter(fileWriter);
-            fileWriter.write(json);
-            fileWriter.flush();
-            bw.newLine();
 
 
             clearFields();
