@@ -24,7 +24,7 @@ import javafx.stage.Stage;
 //import utils.ConnectionUtil;
 import lombok.Cleanup;
         import model.ChildrenFactory;
-import model.ChildrenPair;
+import model.ChildrenPairFactory;
 import model.ProjectFactory;
 
 import java.io.*;
@@ -122,9 +122,8 @@ public class Project_FormController implements Initializable {
 
             ChildrenFactory child = new ChildrenFactory(ChildrenTxt.getText()); // Creating the new Child
             Gson gson = new Gson();
-            
 
-            ChildrenPair c = new ChildrenPair(this.ChildrenTxt);
+            ChildrenPairFactory c = new ChildrenPairFactory(this.ChildrenTxt);
             List<String>children = c.childs();
 
 
