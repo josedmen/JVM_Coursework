@@ -82,6 +82,9 @@ public class Project_FormController implements Initializable {
     @FXML
     private TextField ChildrenTxt;
 
+    @FXML
+    private TextField IdTxt;
+
     private ObservableList<ProjectFactory> listOfTasks;
 
 
@@ -91,7 +94,7 @@ public class Project_FormController implements Initializable {
     @FXML
     protected void SaveData(MouseEvent event) {
         //check if not empty
-        if (ProjectName.getText().isEmpty() || TeamLeader.getText().isEmpty() || Email.getText().isEmpty()
+        if (ProjectName.getText().isEmpty() || TeamLeader.getText().isEmpty() || Email.getText().isEmpty()||IdTxt.getText().isEmpty()
                 || Deadline.getValue().equals(null) || PhoneNumberTxt.getText().isEmpty() || DurationTxt.getText().isEmpty()) {
             lblGreeting.setTextFill(Color.TOMATO);
             lblGreeting.setText("Enter all details !!");
@@ -111,6 +114,7 @@ public class Project_FormController implements Initializable {
         UrgencyLevel.clear();
         ChildrenTxt.clear();
         DurationTxt.clear();
+        IdTxt.clear();
     }
 
     private String saveData() {
@@ -127,7 +131,7 @@ public class Project_FormController implements Initializable {
             ProjectFactory factory = new ProjectFactory(ProjectName.getText()
                     , true, Email.getText(), PhoneNumberTxt.getText()
                     , TeamLeader.getText(), Deadline.getValue().toString(),
-                    ProjectName.getText(), ChildrenTxt.getText(), children,
+                    ProjectName.getText(), IdTxt.getText(), children,
                     Float.parseFloat(DurationTxt.getText()));
 
             List<ProjectFactory> list = new Gson().fromJson(url, new TypeToken<List<ProjectFactory>>() {
