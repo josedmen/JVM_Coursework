@@ -27,6 +27,8 @@ import lombok.Cleanup;
         import model.ChildrenFactory;
 import model.ChildrenPairFactory;
 import model.ProjectFactory;
+import persistance.APersistance;
+import persistance.FilePersistence;
 
 import java.io.*;
 import java.net.URL;
@@ -133,8 +135,14 @@ public class Project_FormController implements Initializable {
                     ProjectName.getText(), ChildrenTxt.getText(), children,
                     Float.parseFloat(DurationTxt.getText()));
 
-            Persistance p = new Persistance();
-            p.saveData(factory,list,url);
+            list.add(factory);
+
+            /*Persistance p = new Persistance();
+            p.saveData(factory,list,url);*/
+
+           APersistance ap = new FilePersistence();
+           ap.saveProjects(TRIAL_FILE,list);
+
 
 
 
