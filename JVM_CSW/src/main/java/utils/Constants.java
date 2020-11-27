@@ -16,12 +16,12 @@ public class Constants {
     public static String FXML_ITEM_TASK = "/View/TaskItem.fxml";
     public static String ICON_CHECK_UNFILL = "/icons/icons8_checked_filled_24px.png";
     public static String ICON_CHECK_FILL = "/icons/icons8_checked_filled_24px_1.png";
-    public static String PROJECTS_DATA = "./src/main/resources/Projects/Default/Default.json";
+    public static String PROJECTS_DATA = "./src/main/resources/Projects/Default/tasks.json";
     public static String APP_TITLE = "JFX Task Manager";
     public static String ROOT_DIRECTORY = "./src/main/resources/Projects/";
     public static String FXML_Critical_PATH = "/View/CriticalPath.fxml";
     public static Double X_OFFSET = 0.0 ;
     public static Double Y_OFFSET = 0.0 ;
     public static ObservableList<CriticalPathFactory> LIST_OF_TASKS;
-    //ObservableList<CriticalPathFactory> listOfTasks
+
 }

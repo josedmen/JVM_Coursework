@@ -69,7 +69,7 @@ public class CriticalPathController implements Initializable {
 
 
 
-/** Corresponds to the Scala Implementation uses code extracted from the scala package**/
+/** Corresponds to the Scala Implementation uses code extracted from the scala directory**/
     @FXML
     public void LoadScala(MouseEvent mouseEvent) {
 
@@ -78,7 +78,7 @@ public class CriticalPathController implements Initializable {
     }
 
 
-    /** Corresponds to the Kotlin Implementation uses code extracted from the kotlin package**/
+    /** Corresponds to the Kotlin Implementation uses code extracted from the kotlin directory**/
 
     @FXML
     public void LoadKotlin(MouseEvent mouseEvent) {
