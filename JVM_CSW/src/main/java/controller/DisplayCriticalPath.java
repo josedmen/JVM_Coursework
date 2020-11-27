@@ -13,7 +13,8 @@ import java.util.List;
 public class DisplayCriticalPath {
 
 
-    public void displayCriticalPath(String startPoint, List<CriticalPathFactory> path, float totalDuration, TextArea CriticalPathArea) {
+    public void displayCriticalPath(String startPoint, List<CriticalPathFactory> path, float totalDuration,
+                                    TextArea CriticalPathArea,String Implementation) {
         StringBuilder builder = new StringBuilder();
         final String NEW_LINE = "\n";
         final String TAB = "\t";
@@ -23,6 +24,8 @@ public class DisplayCriticalPath {
         }
 
         builder
+                .append(Implementation)
+                .append(NEW_LINE)
                 .append("Critical Path from ")
                 .append(startPoint)
                 .append(" total duration ")

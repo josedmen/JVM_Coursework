@@ -52,6 +52,6 @@ public class ImplementScala {
 
 
         DisplayCriticalPath d = new DisplayCriticalPath();
-        d.displayCriticalPath("task_1", path, total_duration,CriticalPathArea);
+        d.displayCriticalPath("task_1", path, total_duration,CriticalPathArea,"Scala Implementation");
     }
 }
