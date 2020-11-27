@@ -36,7 +36,7 @@ public class Main extends Application {
             stage.setTitle(Constants.APP_TITLE);
             stage.initStyle(StageStyle.TRANSPARENT);
 
-            // Grab your root here
+            // Grab your Window
             root.setOnMousePressed((MouseEvent event) -> {
                 xOffset = event.getSceneX();
                 yOffset = event.getSceneY();

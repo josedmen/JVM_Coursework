@@ -36,7 +36,8 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-import static utils.Constants.ROOT_DIRECTORY;
+
+import static utils.Constants.*;
 
 
 /**
@@ -143,92 +144,17 @@ public class CriticalPathController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        executorService.submit(fetchList);
 
-        fetchList.setOnSucceeded((event) -> {
+        DisplayItems displayItems =  new DisplayItems();
+        displayItems.Display(vTaskItems,lblProjectCount);
 
-            listOfTasks = FXCollections.observableArrayList(fetchList.getValue());
-            int size = listOfTasks.size();
-            lblProjectCount.setText("Projects:(" + size + ")");
-
-
-
-            try { //load task items to vbox
-                Node[] nodes = new Node[size];
-                for (int i = 0; i < nodes.length; i++) {
-                    //load specific item
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource(Constants.FXML_ITEM_TASK));
-                    TaskItemController controller = new TaskItemController();
-                    loader.setController(controller);
-                    nodes[i] = loader.load();
-                    vTaskItems.getChildren().add(nodes[i]);
-                    controller.setTask(listOfTasks.get(i));
-                }
-
-                // Optional
-                for (int i = 0; i < nodes.length; i++) {
-                    try {
-                        nodes[i] = FXMLLoader.load(getClass().getResource(Constants.FXML_ITEM_TASK));
-                        //vTaskItemsupcoming.getChildren().add(nodes[i]);
-                    } catch (Exception e) {
-                    }
-                }
-            } catch (Exception e) {
-                System.err.println("Error Creating Tasks...");
-                System.err.println(e.getMessage());
-            }
-        });
     }
-
-    public final Task<List<CriticalPathFactory>> fetchList = new Task() {
-
-        @Override
-        protected List<CriticalPathFactory> call() throws Exception {
-            List<CriticalPathFactory> list = null;
-            try {
-
-                BufferedReader url = new BufferedReader(new FileReader(Constants.PROJECTS_DATA));
-                System.out.println(url);
-                list = new Gson().fromJson(url, new TypeToken<List<CriticalPathFactory>>() {
-                }.getType());
-                //System.out.println(list);
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return list;
-        }
-
-
-    };
 
     public void ReturnHome(MouseEvent event) {
         if (event.getSource() == HomeButton1) {
-            try {
-                Node node = (Node) event.getSource();
-                Stage stage = (Stage) node.getScene().getWindow();
-                stage.close();
-                Scene scene = new Scene(FXMLLoader.load(getClass().getResource(Constants.FXML_HOME)));
-                stage.setScene(scene);
-                stage.show();
 
-                scene.setOnMousePressed((MouseEvent mouseEvent) -> {
-                    xOffset = mouseEvent.getSceneX();
-                    yOffset = mouseEvent.getSceneY();
-                });
-
-                scene.setOnMouseDragged((MouseEvent mouseEvent) -> {
-                    stage.setX(mouseEvent.getScreenX() - xOffset);
-                    stage.setY(mouseEvent.getScreenY() - yOffset);
-                });
-
-
-            } catch (IOException ex) {
-
-                System.err.println(ex.getMessage());
-            }
+            LoadWindow loadWindow = new LoadWindow();
+            loadWindow.Load(event,FXML_HOME);
 
         }
     }
@@ -236,44 +162,17 @@ public class CriticalPathController implements Initializable {
     @FXML
     public void RefreshPage(MouseEvent mouseEvent) {
         if (mouseEvent.getSource() == RefreshBtn) {
-            try {
-                Node node = (Node) mouseEvent.getSource();
-                Stage stage = (Stage) node.getScene().getWindow();
-                stage.close();
-                Scene scene = new Scene(FXMLLoader.load(getClass().getResource(Constants.FXML_Critical_PATH)));
-                stage.setScene(scene);
-                stage.show();
-
-                scene.setOnMousePressed((MouseEvent Event) -> {
-                    xOffset = Event.getSceneX();
-                    yOffset = Event.getSceneY();
-                });
-
-                scene.setOnMouseDragged((MouseEvent Event) -> {
-                    stage.setX(Event.getScreenX() - xOffset);
-                    stage.setY(Event.getScreenY() - yOffset);
-                });
-
-
-            } catch (IOException ex) {
-
-                System.err.println(ex.getMessage());
-            }
+            
+            LoadWindow loadWindow = new LoadWindow();
+            loadWindow.Load(mouseEvent,FXML_Critical_PATH);
         }
     }
 
     @FXML
     public void ChangeDirectorie(MouseEvent mouseEvent) {
 
-        final FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File(ROOT_DIRECTORY));
-
-        Stage stage = (Stage) AnchorPanel.getScene().getWindow();
-
-        File file = fileChooser.showOpenDialog(stage);
-        String ChangetoDirectory = file.getAbsolutePath();
-        Constants.PROJECTS_DATA = ChangetoDirectory;
-        System.out.println(ChangetoDirectory);
+        ChooseProject chooseProject = new ChooseProject();
+        chooseProject.choose(AnchorPanel);
 
     }
 }

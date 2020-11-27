@@ -6,6 +6,9 @@
 package utils;
 
 
+import javafx.collections.ObservableList;
+import model.CriticalPathFactory;
+
 public class Constants {
 
     public static String FXML_HOME = "/View/Home.fxml";
@@ -17,4 +20,8 @@ public class Constants {
     public static String APP_TITLE = "JFX Task Manager";
     public static String ROOT_DIRECTORY = "./src/main/resources/Projects/";
     public static String FXML_Critical_PATH = "/View/CriticalPath.fxml";
+    public static Double X_OFFSET = 0.0 ;
+    public static Double Y_OFFSET = 0.0 ;
+    public static ObservableList<CriticalPathFactory> LIST_OF_TASKS;
+    //ObservableList<CriticalPathFactory> listOfTasks
 }
