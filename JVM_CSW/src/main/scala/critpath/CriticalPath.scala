@@ -103,4 +103,25 @@ object CriticalPath {
     fromJavaList(map, DAG.empty, map.keySet().iterator())
   }
 
+  /**
+   * Gets the sum of each the task and child paths
+   *
+   * @param task The task to start from
+   *
+   * @return The total duration of the tasks given or zero if tasks is null
+   */
+  def getWholeGraphDuration[T, Q](task: T, taskIDNetwork: DAG[T], idToTaskMap: Function[T, Q], taskToDuration: Function[Q, Float]) : Float = {
+    if(task == null) 0
+    else {
+      Set[T](task).map(
+        e => taskToDuration(idToTaskMap(e)) + taskIDNetwork.getChildren(e).map(a => getWholeGraphDuration(a, taskIDNetwork, idToTaskMap, taskToDuration)).sum
+      ).sum
+    }
+  }
+
+  def getCriticalPathDuration[Q](list: java.util.List[Q], taskToDuration: Function[Q, Float]) : Float = {
+    if(list == null || list.isEmpty) 0
+    scala.jdk.CollectionConverters.ListHasAsScala(list).asScala.toList.map(e => taskToDuration(e)).sum
+  }
+
 }

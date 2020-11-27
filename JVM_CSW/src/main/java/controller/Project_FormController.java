@@ -1,15 +1,7 @@
 package controller;
 
-import com.google.gson.JsonParser;
-//import org.json.*;
 
-//import com.mysql.jdbc.Connection;
-//import com.mysql.jdbc.PreparedStatement;
-
-import Utils.Constants;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -19,26 +11,40 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-//import utils.ConnectionUtil;
+import kotlin.Pair;
 import lombok.Cleanup;
+import model.ChildrenPairFactory;
+import model.CriticalPathFactory;
 import model.ProjectFactory;
+import persistance.FilePersistence;
+import utils.Constants;
 
 import java.io.*;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static Utils.Constants.FXML_HOME;
-import static Utils.Constants.PROJECTS_DATA;
+import static utils.Constants.FXML_HOME;
+import static utils.Constants.FXML_PROJECT_FORM;
+import static utils.Constants.ROOT_DIRECTORY;
+
+
 
 public class Project_FormController implements Initializable {
+
 
     @FXML
     private TextField ProjectName;
@@ -50,13 +56,10 @@ public class Project_FormController implements Initializable {
     private TextField Email;
 
     @FXML
-    private TextField UrgencyLevel;
+    private TextField StatusTxt;
 
     @FXML
     private TextField PhoneNumberTxt;
-
-    @FXML
-    private DatePicker Deadline;
 
     @FXML
     private Button SaveButton;
@@ -65,10 +68,8 @@ public class Project_FormController implements Initializable {
     private Button HomeButton;
 
     @FXML
-    private Label lblToday;
+    private Label lblProjectCount;
 
-    @FXML
-    private Label lblUpcoming;
 
     @FXML
     private VBox vTaskItems;
@@ -82,7 +83,22 @@ public class Project_FormController implements Initializable {
     @FXML
     private TextField ChildrenTxt;
 
-    private ObservableList<ProjectFactory> listOfTasks;
+    @FXML
+    private TextField IdTxt;
+
+    @FXML
+    private Button RefreshBtn;
+
+    @FXML
+    private Button ChangeProject;
+
+    @FXML
+    private AnchorPane AnchorPanel;
+
+    private ObservableList<CriticalPathFactory> listOfTasks;
+
+    private double xOffset = 0;
+    private double yOffset = 0;
 
 
     public Project_FormController() {
@@ -90,9 +106,9 @@ public class Project_FormController implements Initializable {
 
     @FXML
     protected void SaveData(MouseEvent event) {
-        //check if not empty
+      /**Checks that the necessary Fields are filled , if not will display enter All Display for the User **/
         if (ProjectName.getText().isEmpty() || TeamLeader.getText().isEmpty() || Email.getText().isEmpty()
-                || Deadline.getValue().equals(null)|| PhoneNumberTxt.getText().isEmpty() ||ChildrenTxt.getText().isEmpty()||DurationTxt.getText().isEmpty()){
+                || PhoneNumberTxt.getText().isEmpty() || DurationTxt.getText().isEmpty()) {
             lblGreeting.setTextFill(Color.TOMATO);
             lblGreeting.setText("Enter all details !!");
         } else {
@@ -107,46 +123,58 @@ public class Project_FormController implements Initializable {
         TeamLeader.clear();
         PhoneNumberTxt.clear();
         Email.clear();
-        Deadline.setValue(null);
-        UrgencyLevel.clear();
+        StatusTxt.clear();
+        ChildrenTxt.clear();
+        DurationTxt.clear();
+        IdTxt.clear();
+
     }
 
     private String saveData() {
-        List<ProjectFactory> list = null;
+
+        /** User Defined Directory Path,gives the user the ability of Creating a Main Project Folder and Add inside Child tasks **/
+
+        String DIRECTORY_PATH = "./src/main/resources/Projects/" + ProjectName.getText() ;
+
         try {
-            //code to add to json
 
+            ChildrenPairFactory ch = new ChildrenPairFactory(this.ChildrenTxt);
             ProjectFactory factory = new ProjectFactory(ProjectName.getText()
-                    ,true,Email.getText(),PhoneNumberTxt.getText(),TeamLeader.getText()
-                    ,Deadline.getValue().toString(),ProjectName.getText(),ChildrenTxt.getText(),Float.valueOf(DurationTxt.getText()));
-            BufferedReader url = new BufferedReader(new FileReader(Constants.PROJECTS_DATA));
+                    , StatusTxt.getText(), Email.getText(), PhoneNumberTxt.getText()
+                    , TeamLeader.getText(), IdTxt.getText(), ChildrenTxt.getText(), ch.childs(ChildrenTxt.getText()),
+                    Float.parseFloat(DurationTxt.getText()));
 
-            list = new Gson().fromJson(url, new TypeToken<List<ProjectFactory>>() {
-            }.getType());
-            list.add(factory);
-            
-            Gson gson = new Gson();
+            CriticalPathFactory criticalPathFactory = new CriticalPathFactory(ProjectName.getText()
+                    , StatusTxt.getText(), Email.getText(), PhoneNumberTxt.getText()
+                    , TeamLeader.getText(), IdTxt.getText(), ChildrenTxt.getText(), ch.childs(ChildrenTxt.getText()),
+                    Float.parseFloat(DurationTxt.getText()));
 
-            String json = gson.toJson(list);
+            FilePersistence file = new FilePersistence();
+            Pair<ProjectFactory, List<CriticalPathFactory>> load_pair = file.loadProject(DIRECTORY_PATH);
 
+            if(load_pair.component1() != null) {
 
-            System.out.println(json);
+                List<CriticalPathFactory> list = new ArrayList<>();
+                list.addAll(load_pair.component2());
+                list.add(criticalPathFactory);
+                file.saveProject(DIRECTORY_PATH, factory, list);
 
-
-            FileWriter fileWriter = new FileWriter(PROJECTS_DATA);         // writing back to the file
-            fileWriter.write(json);
-            fileWriter.flush();
-
-            Project_FormController p = new Project_FormController();
+            } else {
+                file.saveProject(DIRECTORY_PATH, factory, Arrays.asList(criticalPathFactory));
+            }
             clearFields();
             return "Success";
-
-        } catch (Exception ex) {
+        } catch(Exception ex){
             System.out.println(ex.getMessage());
             lblGreeting.setTextFill(Color.TOMATO);
             lblGreeting.setText(ex.getMessage());
             return "Exception";
         }
+
+
+
+
+
     }
 
 
@@ -159,6 +187,16 @@ public class Project_FormController implements Initializable {
                 Scene scene = new Scene(FXMLLoader.load(getClass().getResource(FXML_HOME)));
                 stage.setScene(scene);
                 stage.show();
+
+                scene.setOnMousePressed((MouseEvent mouseEvent) -> {
+                    xOffset = mouseEvent.getSceneX();
+                    yOffset = mouseEvent.getSceneY();
+                });
+
+                scene.setOnMouseDragged((MouseEvent mouseEvent) -> {
+                    stage.setX(mouseEvent.getScreenX() - xOffset);
+                    stage.setY(mouseEvent.getScreenY() - yOffset);
+                });
 
 
             } catch (IOException ex) {
@@ -184,8 +222,8 @@ public class Project_FormController implements Initializable {
 
             listOfTasks = FXCollections.observableArrayList(fetchList.getValue());
             int size = listOfTasks.size();
-            lblToday.setText("Today(" + size + ")");
-            lblUpcoming.setText("Upcoming(" + 0 + ")");
+            lblProjectCount.setText("Projects: (" + size + ")");
+
 
             try { //load task items to vbox
                 Node[] nodes = new Node[size];
@@ -214,18 +252,18 @@ public class Project_FormController implements Initializable {
         });
     }
 
-    public final Task<List<ProjectFactory>> fetchList = new Task() {
+    public final Task<List<CriticalPathFactory>> fetchList = new Task() {
 
         @Override
-        protected List<ProjectFactory> call() throws Exception {
-            List<ProjectFactory> list = null;
+        protected List<CriticalPathFactory> call() throws Exception {
+            List<CriticalPathFactory> list = null;
             try {
 
                 BufferedReader url = new BufferedReader(new FileReader(Constants.PROJECTS_DATA));
-                System.out.println(url);
-                list = new Gson().fromJson(url, new TypeToken<List<ProjectFactory>>() {
+                //System.out.println(url);
+                list = new Gson().fromJson(url, new TypeToken<List<CriticalPathFactory>>() {
                 }.getType());
-                System.out.println(list);
+                //System.out.println(list);
 
 
             } catch (Exception e) {
@@ -253,5 +291,47 @@ public class Project_FormController implements Initializable {
         return buffer.toString();
     }
 
+    @FXML
+    public void RefreshPage(MouseEvent mouseEvent) {
+        if (mouseEvent.getSource() == RefreshBtn) {
+            try {
+                Node node = (Node) mouseEvent.getSource();
+                Stage stage = (Stage) node.getScene().getWindow();
+                stage.close();
+                Scene scene = new Scene(FXMLLoader.load(getClass().getResource(FXML_PROJECT_FORM)));
+                stage.setScene(scene);
+                stage.show();
+
+                scene.setOnMousePressed((MouseEvent Event) -> {
+                    xOffset = Event.getSceneX();
+                    yOffset = Event.getSceneY();
+                });
+
+                scene.setOnMouseDragged((MouseEvent Event) -> {
+                    stage.setX(Event.getScreenX() - xOffset);
+                    stage.setY(Event.getScreenY() - yOffset);
+                });
+
+
+            } catch (IOException ex) {
+
+                System.err.println(ex.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    public void ChangeDirectorie(MouseEvent mouseEvent) {
+
+        final FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(ROOT_DIRECTORY));
+
+        Stage stage = (Stage) AnchorPanel.getScene().getWindow();
+
+        File file = fileChooser.showOpenDialog(stage);
+        String ChangedDirectories = file.getAbsolutePath();
+        Constants.PROJECTS_DATA = ChangedDirectories;
+        System.out.println(ChangedDirectories);
+    }
 }
 
